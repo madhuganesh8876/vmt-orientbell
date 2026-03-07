@@ -1,4 +1,4 @@
-const API = 'http://127.0.0.1:5000/api';
+const API = 'https://vmt-backend-4tpn.onrender.com/api';
 
 // Show toast notification
 function showToast(message, type = 'success') {
