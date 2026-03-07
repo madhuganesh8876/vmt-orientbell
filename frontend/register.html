@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VMT – Visitor Registration</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #FAFAF8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      background: rgba(250,250,248,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #E8E4DE;
+      padding: 0 60px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo { font-size: 1rem; font-weight: 700; color: #1a1a1a; letter-spacing: -0.3px; }
+    .nav-logo span { color: #999; font-weight: 400; }
+
+    .nav-back {
+      color: #888;
+      font-size: 0.85rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover { color: #1a1a1a; }
+
+    .page-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 20px 60px;
+    }
+
+    .reg-card {
+      background: white;
+      border: 1px solid #E8E4DE;
+      border-radius: 20px;
+      padding: 48px;
+      width: 100%;
+      max-width: 580px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+    }
+
+    .reg-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #999;
+      margin-bottom: 10px;
+    }
+
+    .reg-card h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: -0.8px;
+      margin-bottom: 6px;
+    }
+
+    .reg-card .subtitle {
+      color: #999;
+      font-size: 0.88rem;
+      margin-bottom: 36px;
+    }
+
+    .form-divider {
+      height: 1px;
+      background: #F0ECE6;
+      margin: 24px 0;
+    }
+
+    .form-section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #bbb;
+      margin-bottom: 16px;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 7px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1.5px solid #E8E4DE;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: #1a1a1a;
+      background: #FAFAF8;
+      transition: all 0.2s;
+      outline: none;
+      appearance: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #1a1a1a;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    }
+
+    input::placeholder { color: #bbb; }
+
+    .select-wrap { position: relative; }
+
+    .select-wrap::after {
+      content: '\f107';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+      pointer-events: none;
+      font-size: 0.85rem;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover { background: #333; transform: translateY(-1px); }
+
+    /* SUCCESS */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .success-icon {
+      width: 72px; height: 72px;
+      background: #f0faf4;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 1.8rem;
+      color: #27AE60;
+    }
+
+    .success-screen h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .success-screen p {
+      color: #888;
+      font-size: 0.88rem;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .badge-box {
+      background: #FAFAF8;
+      border: 1px solid #E8E4DE;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+
+    .badge-box .badge-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #bbb;
+      margin-bottom: 8px;
+    }
+
+    .badge-box .badge-id {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: -1px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1a1a1a;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover { background: #333; }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      top: 20px; right: 20px;
+      background: white;
+      color: #1a1a1a;
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      z-index: 9999;
+      transform: translateX(130%);
+      transition: transform 0.35s ease;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      border: 1px solid #E8E4DE;
+    }
+
+    .toast.show { transform: translateX(0); }
+    .toast.error { border-left: 3px solid #E74C3C; }
+    .toast.success { border-left: 3px solid #27AE60; }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 520px) {
+      .form-row { grid-template-columns: 1fr; }
+      .reg-card { padding: 28px 20px; }
+      nav { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" style="display:flex; align-items:center; gap:10px;">
+    <img src="images/logo.png" style="height:36px; width:auto;" alt="Orientbell"/>
+    <span style="color:#1a1a1a; font-weight:700; font-size:1rem;">VMT <span style="color:#999; font-weight:400;">| Orientbell</span></span>
+  </div>
+  <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+</nav>
+
+<div class="page-wrap">
+  <div class="reg-card">
+
+    <!-- Form -->
+    <div id="formSection">
+      <div class="reg-tag">Visitor Check-In</div>
+      <h1>Welcome to Orientbell</h1>
+      <p class="subtitle">Fill in your details below to complete your check-in.</p>
+
+      <div class="form-section-label">Personal Details</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="vName" placeholder="Your full name"/>
+        </div>
+        <div class="form-group">
+          <label>Company / Organization</label>
+          <input type="text" id="vCompany" placeholder="Your company"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="vEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="tel" id="vPhone" placeholder="10-digit number"/>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+      <div class="form-section-label">Visit Details</div>
+
+      <div class="form-group">
+        <label>Host (Person you are meeting) *</label>
+        <div class="select-wrap">
+          <select id="vHost">
+            <option value="">-- Select Host --</option>
+            <option value="2">Rahul Sharma (Sales)</option>
+            <option value="3">Jagatheeswaran Palsamy (Management)</option>
+            <option value="4">Dr. Vijay M (Research & Development)</option>
+            <option value="5">Dr. N. Sundareswaran (Quality Control)</option>
+            <option value="6">Mrs. Sujitha (Human Resources)</option>
+            <option value="7">Dr. D. Balakrishnan (Operations)</option>
+            <option value="8">Vibusha S Achari (Sales)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Purpose of Visit *</label>
+          <div class="select-wrap">
+            <select id="vPurpose">
+              <option value="">-- Select Purpose --</option>
+              <option>Business Meeting</option>
+              <option>Sales / Demo</option>
+              <option>Delivery</option>
+              <option>Interview</option>
+              <option>Audit / Inspection</option>
+              <option>Personal Visit</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Plant Location</label>
+          <div class="select-wrap">
+            <select id="vPlant">
+              <option>Plant 1 - Delhi</option>
+              <option>Plant 2 - Mumbai</option>
+              <option>Plant 3 - Chennai</option>
+              <option>Head Office - Gurugram</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="submitRegistration()">
+        <span id="regBtnText">Complete Check-In</span>
+        <i class="fas fa-arrow-right" id="regBtnIcon"></i>
+      </button>
+    </div>
+
+    <!-- Success -->
+    <div class="success-screen" id="successSection">
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h2>You're Checked In!</h2>
+      <p>Your host has been notified and will come to receive you shortly. Please wait at the reception area.</p>
+      <div class="badge-box">
+        <div class="badge-label">Your Visitor Badge Code</div>
+        <div class="badge-id" id="badgeCode">VMT-0000</div>
+      </div>
+      <p style="font-size:0.8rem; color:#bbb; margin-bottom:24px;">Show this code to security personnel if asked.</p>
+      <a href="index.html" class="back-btn"><i class="fas fa-home"></i> Back to Home</a>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="vmtToast"></div>
+
+<script>
+  const API = 'http://127.0.0.1:5000/api';
+
+  function showToast(msg, type) {
+    const t = document.getElementById('vmtToast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  async function loadHosts() {
+    try {
+      const res = await fetch(`${API}/auth/hosts`);
+      const hosts = await res.json();
+      const select = document.getElementById('vHost');
+      select.innerHTML = '<option value="">-- Select Host --</option>';
+      hosts.forEach(h => {
+        const opt = document.createElement('option');
+        opt.value = h.id;
+        opt.textContent = `${h.name} (${h.department || h.plant})`;
+        select.appendChild(opt);
+      });
+    } catch(e) {
+      console.log('Using fallback hosts');
+    }
+  }
+
+  async function submitRegistration() {
+    const name = document.getElementById('vName').value.trim();
+    const phone = document.getElementById('vPhone').value.trim();
+    const hostId = document.getElementById('vHost').value;
+    const purpose = document.getElementById('vPurpose').value;
+
+    if (!name) { showToast('Please enter your name', 'error'); return; }
+    if (!phone) { showToast('Please enter your phone number', 'error'); return; }
+    if (!hostId) { showToast('Please select a host', 'error'); return; }
+    if (!purpose) { showToast('Please select purpose of visit', 'error'); return; }
+
+    document.getElementById('regBtnText').textContent = 'Processing...';
+    document.getElementById('regBtnIcon').style.display = 'none';
+
+    try {
+      const res = await fetch(`${API}/visits/checkin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visitor_name: name,
+          visitor_email: document.getElementById('vEmail').value,
+          visitor_phone: phone,
+          visitor_company: document.getElementById('vCompany').value,
+          host_id: parseInt(hostId),
+          purpose: purpose,
+          plant: document.getElementById('vPlant').value
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Something went wrong');
+
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('successSection').style.display = 'block';
+      document.getElementById('badgeCode').textContent = `VMT-${data.visit.id}`;
+
+    } catch(e) {
+      showToast(e.message || 'Cannot connect to server', 'error');
+      document.getElementById('regBtnText').textContent = 'Complete Check-In';
+      document.getElementById('regBtnIcon').style.display = '';
+    }
+  }
+
+  loadHosts();
+</script>
+</body>
+</html>

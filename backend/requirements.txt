@@ -1,0 +1,11 @@
+flask
+flask-sqlalchemy
+flask-cors
+flask-jwt-extended
+flask-mail
+mysql-connector-python
+qrcode
+pillow
+python-dotenv
+werkzeug
+gunicorn

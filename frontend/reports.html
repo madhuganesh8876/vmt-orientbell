@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VMT – Reports</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    .layout { display: flex; min-height: 100vh; }
+    .main-content { flex: 1; margin-left: 240px; padding: 28px; background: var(--light); }
+    .filter-card { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
+    .filter-row { display: grid; grid-template-columns: repeat(4,1fr) auto; gap: 14px; align-items: end; }
+    .results-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .results-header { padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eef1f8; }
+    .results-header h3 { color: var(--primary); font-weight: 700; font-size: 1rem; }
+    .btn-export { background: none; border: 1.5px solid var(--primary); color: var(--primary); padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-family: inherit; font-weight: 600; transition: all 0.2s; }
+    .btn-export:hover { background: var(--primary); color: white; }
+    @media(max-width:900px) { .filter-row { grid-template-columns: 1fr 1fr; } .main-content { margin-left: 0; } }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <div class="vmt-sidebar">
+    <div class="sidebar-brand">VMT <span>|</span> Admin</div>
+    <a href="admin.html"><i class="fas fa-th-large"></i> Dashboard</a>
+    <a href="receptionist.html"><i class="fas fa-concierge-bell"></i> Reception</a>
+    <a href="reports.html" class="active"><i class="fas fa-file-alt"></i> Reports</a>
+    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <h1>Visitor Reports</h1>
+        <p>Filter, view and export visitor logs</p>
+      </div>
+    </div>
+
+    <div class="filter-card">
+      <h3 style="color:var(--primary); font-size:1rem; font-weight:700; margin-bottom:16px">
+        <i class="fas fa-filter" style="color:var(--accent)"></i> Filter Visitors
+      </h3>
+      <div class="filter-row">
+        <div>
+          <label class="form-label">From Date</label>
+          <input type="date" id="fStart" class="form-control"/>
+        </div>
+        <div>
+          <label class="form-label">To Date</label>
+          <input type="date" id="fEnd" class="form-control"/>
+        </div>
+        <div>
+          <label class="form-label">Plant</label>
+          <select id="fPlant" class="form-select">
+            <option value="">All Plants</option>
+            <option>Plant 1 - Delhi</option>
+            <option>Plant 2 - Mumbai</option>
+            <option>Plant 3 - Chennai</option>
+            <option>Head Office - Gurugram</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Status</label>
+          <select id="fStatus" class="form-select">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="checked_out">Checked Out</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn-accent-vmt" style="padding:10px 20px; white-space:nowrap" onclick="loadReport()">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-card">
+      <div class="results-header">
+        <h3><i class="fas fa-table" style="color:var(--accent)"></i> Results &nbsp;<span id="resultCount" style="color:#888; font-weight:400; font-size:0.9rem"></span></h3>
+        <button class="btn-export" onclick="exportCSV()">
+          <i class="fas fa-file-csv"></i> Export CSV
+        </button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="vmt-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Visitor Name</th>
+              <th>Phone</th>
+              <th>Company</th>
+              <th>Host</th>
+              <th>Purpose</th>
+              <th>Plant</th>
+              <th>Check-In</th>
+              <th>Check-Out</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="reportTable">
+            <tr><td colspan="10" style="text-align:center; padding:30px; color:#888">Click Search to load reports</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  requireAuth(['admin', 'receptionist']);
+  let reportData = [];
+
+  async function loadReport() {
+    const start = document.getElementById('fStart').value;
+    const end = document.getElementById('fEnd').value;
+    const plant = document.getElementById('fPlant').value;
+
+    let url = '/reports/visitor-flow?';
+    if (start) url += `start=${start}&`;
+    if (end) url += `end=${end}&`;
+    if (plant) url += `plant=${encodeURIComponent(plant)}&`;
+
+    try {
+      let data = await apiCall(url);
+      const status = document.getElementById('fStatus').value;
+      if (status) data = data.filter(v => v.status === status);
+
+      reportData = data;
+      document.getElementById('resultCount').textContent = `(${data.length} records)`;
+
+      const tbody = document.getElementById('reportTable');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:30px; color:#888">No records found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map((v, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td><strong>${v.visitor?.name || '-'}</strong></td>
+          <td>${v.visitor?.phone || '-'}</td>
+          <td>${v.visitor?.company || '-'}</td>
+          <td>${v.host?.name || '-'}</td>
+          <td>${v.purpose || '-'}</td>
+          <td>${v.plant || '-'}</td>
+          <td style="font-size:0.82rem">${formatDate(v.check_in)}</td>
+          <td style="font-size:0.82rem">${v.check_out ? formatDate(v.check_out) : '-'}</td>
+          <td><span class="badge-status badge-${v.status === 'checked_out' ? 'checked-out' : v.status}">${v.status.replace('_',' ')}</span></td>
+        </tr>
+      `).join('');
+    } catch(e) {}
+  }
+
+  function exportCSV() {
+    if (!reportData.length) { showToast('No data to export', 'error'); return; }
+
+    const headers = ['ID','Visitor','Phone','Company','Host','Purpose','Plant','Check-In','Check-Out','Status'];
+    const rows = reportData.map(v => [
+      v.id,
+      v.visitor?.name || '',
+      v.visitor?.phone || '',
+      v.visitor?.company || '',
+      v.host?.name || '',
+      v.purpose || '',
+      v.plant || '',
+      v.check_in || '',
+      v.check_out || '',
+      v.status
+    ]);
+
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `VMT_Report_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    showToast('CSV downloaded!', 'success');
+  }
+
+  loadReport();
+</script>
+</body>
+</html>

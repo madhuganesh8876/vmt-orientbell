@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VMT – Host Dashboard</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    .top-nav { background: var(--primary); padding: 14px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .top-nav .brand { color: white; font-weight: 700; font-size: 1.1rem; }
+    .top-nav .brand span { color: var(--accent); }
+    .top-nav .user-info { color: rgba(255,255,255,0.8); font-size: 0.9rem; display: flex; align-items: center; gap: 16px; }
+    .top-nav button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: inherit; }
+    .notif-bell { position: relative; cursor: pointer; }
+    .notif-count { position: absolute; top: -8px; right: -8px; background: var(--accent); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+    .page-body { padding: 28px; max-width: 1100px; margin: 0 auto; }
+
+    .welcome-card { background: linear-gradient(135deg, var(--primary), #2d5fa8); color: white; border-radius: var(--radius); padding: 28px 32px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+    .welcome-card h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+    .welcome-card p { opacity: 0.8; font-size: 0.9rem; }
+    .welcome-card .big-num { font-size: 3rem; font-weight: 800; color: var(--accent); }
+
+    .section-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    .visitor-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+
+    .visitor-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border-top: 4px solid var(--accent); }
+    .visitor-card .vc-name { font-weight: 700; font-size: 1rem; color: var(--dark); margin-bottom: 4px; }
+    .visitor-card .vc-company { color: #888; font-size: 0.85rem; margin-bottom: 14px; }
+    .visitor-card .vc-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .visitor-card .vc-detail { font-size: 0.8rem; color: #555; }
+    .visitor-card .vc-detail strong { color: var(--primary); display: block; font-size: 0.75rem; }
+    .btn-approve { background: #e8f9ef; color: #1a8a4a; border: 1px solid #a8e6c0; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; font-family: inherit; transition: all 0.2s; }
+    .btn-approve:hover { background: #1a8a4a; color: white; }
+
+    .notif-panel { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .notif-panel .notif-header { background: var(--primary); color: white; padding: 16px 20px; font-weight: 600; }
+    .notif-item { padding: 16px 20px; border-bottom: 1px solid #f0f4fb; display: flex; align-items: flex-start; gap: 14px; transition: background 0.2s; cursor: pointer; }
+    .notif-item:hover { background: #f8faff; }
+    .notif-item.unread { background: #f0f4fb; }
+    .notif-icon { width: 38px; height: 38px; background: rgba(255,107,0,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; }
+    .notif-text { font-size: 0.88rem; color: var(--dark); }
+    .notif-time { font-size: 0.78rem; color: #aaa; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="brand">VMT <span>|</span> Host Dashboard</div>
+  <div class="user-info">
+    <div class="notif-bell" onclick="loadNotifications()">
+      <i class="fas fa-bell" style="font-size:1.1rem; color:white"></i>
+      <div class="notif-count" id="notifCount">0</div>
+    </div>
+    <span><i class="fas fa-user-circle"></i> <span id="userName">Loading...</span></span>
+    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</div>
+
+<div class="page-body">
+  <div class="welcome-card">
+    <div>
+      <h2>Welcome, <span id="welcomeName">Host</span>!</h2>
+      <p id="welcomeDept">Loading department info...</p>
+    </div>
+    <div style="text-align:center">
+      <div class="big-num" id="todayCount">-</div>
+      <div style="opacity:0.8; font-size:0.85rem">Visitors Today</div>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <i class="fas fa-clock" style="color:var(--accent)"></i> Pending Approvals
+  </div>
+  <div class="visitor-cards" id="pendingCards">
+    <p style="color:#888; font-size:0.9rem">Loading...</p>
+  </div>
+
+  <div class="section-title">
+    <i class="fas fa-users" style="color:var(--accent)"></i> Today's Visitors
+  </div>
+  <div style="background:white; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; margin-bottom:28px;">
+    <div style="overflow-x:auto">
+      <table class="vmt-table">
+        <thead>
+          <tr><th>Visitor</th><th>Company</th><th>Purpose</th><th>Check-In</th><th>Status</th></tr>
+        </thead>
+        <tbody id="todayTable">
+          <tr><td colspan="5" style="text-align:center; padding:20px; color:#888">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <i class="fas fa-bell" style="color:var(--accent)"></i> Recent Notifications
+  </div>
+  <div class="notif-panel">
+    <div class="notif-header">Notifications</div>
+    <div id="notifList">
+      <div style="padding:20px; text-align:center; color:#888">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const user = requireAuth(['host', 'admin']);
+  if (user) {
+    document.getElementById('userName').textContent = user.name;
+    document.getElementById('welcomeName').textContent = user.name.split(' ')[0];
+    document.getElementById('welcomeDept').textContent = `${user.department || 'Department'} — ${user.plant || 'Plant'}`;
+  }
+
+  async function loadTodayVisits() {
+    if (!user) return;
+    try {
+      const visits = await apiCall('/visits/today');
+      const myVisits = visits.filter(v => v.host?.id == user.id);
+      document.getElementById('todayCount').textContent = myVisits.length;
+
+      const pending = myVisits.filter(v => v.status === 'pending');
+      const pendingEl = document.getElementById('pendingCards');
+      if (!pending.length) {
+        pendingEl.innerHTML = '<p style="color:#888; font-size:0.9rem">No pending approvals</p>';
+      } else {
+        pendingEl.innerHTML = pending.map(v => `
+          <div class="visitor-card">
+            <div class="vc-name">${v.visitor?.name}</div>
+            <div class="vc-company">${v.visitor?.company || 'Individual'}</div>
+            <div class="vc-details">
+              <div class="vc-detail"><strong>Purpose</strong>${v.purpose}</div>
+              <div class="vc-detail"><strong>Arrived</strong>${formatDate(v.check_in)}</div>
+              <div class="vc-detail"><strong>Phone</strong>${v.visitor?.phone || '-'}</div>
+              <div class="vc-detail"><strong>Plant</strong>${v.plant}</div>
+            </div>
+            <button class="btn-approve" onclick="approveVisit(${v.id})">
+              <i class="fas fa-check"></i> Approve
+            </button>
+          </div>
+        `).join('');
+      }
+
+      const tbody = document.getElementById('todayTable');
+      if (!myVisits.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888">No visitors today</td></tr>';
+      } else {
+        tbody.innerHTML = myVisits.map(v => `
+          <tr>
+            <td><strong>${v.visitor?.name}</strong></td>
+            <td>${v.visitor?.company || '-'}</td>
+            <td>${v.purpose}</td>
+            <td style="font-size:0.82rem">${formatDate(v.check_in)}</td>
+            <td><span class="badge-status badge-${v.status === 'checked_out' ? 'checked-out' : v.status}">${v.status.replace('_',' ')}</span></td>
+          </tr>
+        `).join('');
+      }
+    } catch(e) {}
+  }
+
+  async function approveVisit(visitId) {
+    try {
+      await apiCall(`/visits/approve/${visitId}`, 'PUT');
+      showToast('Visitor approved!', 'success');
+      loadTodayVisits();
+    } catch(e) {}
+  }
+
+  async function loadNotifications() {
+    if (!user) return;
+    try {
+      const notifs = await apiCall(`/notifications/${user.id}`);
+      const unread = notifs.filter(n => !n.is_read).length;
+      document.getElementById('notifCount').textContent = unread;
+
+      const list = document.getElementById('notifList');
+      if (!notifs.length) {
+        list.innerHTML = '<div style="padding:20px; text-align:center; color:#888">No notifications yet</div>';
+        return;
+      }
+
+      list.innerHTML = notifs.slice(0,10).map(n => `
+        <div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="markRead(${n.id}, this)">
+          <div class="notif-icon"><i class="fas fa-user"></i></div>
+          <div>
+            <div class="notif-text">${n.message}</div>
+            <div class="notif-time">${formatDate(n.created_at)}</div>
+          </div>
+        </div>
+      `).join('');
+    } catch(e) {}
+  }
+
+  async function markRead(id, el) {
+    try {
+      await apiCall(`/notifications/read/${id}`, 'PUT');
+      el.classList.remove('unread');
+      loadNotifications();
+    } catch(e) {}
+  }
+
+  loadTodayVisits();
+  loadNotifications();
+  setInterval(() => { loadTodayVisits(); loadNotifications(); }, 30000);
+</script>
+</body>
+</html>

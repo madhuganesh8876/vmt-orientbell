@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VMT – Admin Dashboard</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    .layout { display: flex; min-height: 100vh; }
+    .main-content { flex: 1; margin-left: 240px; padding: 28px; background: var(--light); }
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-bottom: 28px; }
+    .stat-card-admin { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 16px; }
+    .stat-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+    .stat-icon.blue { background: #e8f0fd; color: var(--primary); }
+    .stat-icon.orange { background: #fff0e6; color: var(--accent); }
+    .stat-icon.green { background: #e8f9ef; color: #1a8a4a; }
+    .stat-icon.purple { background: #f0e8ff; color: #6b21a8; }
+    .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--dark); }
+    .stat-lbl { color: #888; font-size: 0.82rem; margin-top: 2px; }
+    .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .chart-card { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+    .chart-card h3 { color: var(--primary); font-size: 1rem; font-weight: 700; margin-bottom: 20px; }
+    .charts-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    @media(max-width:1100px) { .stats-grid { grid-template-columns: repeat(2,1fr); } .charts-row { grid-template-columns: 1fr; } .charts-row2 { grid-template-columns: 1fr; } }
+    @media(max-width:768px) { .main-content { margin-left: 0; } }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <div class="vmt-sidebar">
+    <div class="sidebar-brand">VMT <span>|</span> Admin</div>
+    <a href="admin.html" class="active"><i class="fas fa-th-large"></i> Dashboard</a>
+    <a href="receptionist.html"><i class="fas fa-concierge-bell"></i> Reception</a>
+    <a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div>
+        <h1>Admin Dashboard</h1>
+        <p>Welcome back, <span id="adminName">Admin</span></p>
+      </div>
+      <button class="btn-primary-vmt" style="padding:10px 20px; font-size:0.85rem" onclick="loadDashboard()">
+        <i class="fas fa-sync"></i> Refresh
+      </button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card-admin">
+        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+        <div><div class="stat-num" id="statToday">-</div><div class="stat-lbl">Visitors Today</div></div>
+      </div>
+      <div class="stat-card-admin">
+        <div class="stat-icon orange"><i class="fas fa-door-open"></i></div>
+        <div><div class="stat-num" id="statActive">-</div><div class="stat-lbl">Currently On-Site</div></div>
+      </div>
+      <div class="stat-card-admin">
+        <div class="stat-icon green"><i class="fas fa-calendar-alt"></i></div>
+        <div><div class="stat-num" id="statMonth">-</div><div class="stat-lbl">This Month</div></div>
+      </div>
+      <div class="stat-card-admin">
+        <div class="stat-icon purple"><i class="fas fa-database"></i></div>
+        <div><div class="stat-num" id="statAll">-</div><div class="stat-lbl">Total All Time</div></div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3><i class="fas fa-chart-line" style="color:var(--accent)"></i> Visitor Traffic — Last 7 Days</h3>
+        <canvas id="trafficChart" height="100"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3><i class="fas fa-chart-pie" style="color:var(--accent)"></i> Visit Purpose</h3>
+        <canvas id="purposeChart" height="180"></canvas>
+      </div>
+    </div>
+
+    <div class="charts-row2">
+      <div class="chart-card">
+        <h3><i class="fas fa-industry" style="color:var(--accent)"></i> Visitors by Plant</h3>
+        <canvas id="plantChart" height="140"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3><i class="fas fa-list" style="color:var(--accent)"></i> Recent Visitors</h3>
+        <div style="overflow-y:auto; max-height:240px" id="recentList">
+          <p style="color:#888; font-size:0.9rem">Loading...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const user = requireAuth(['admin']);
+  if (user) document.getElementById('adminName').textContent = user.name;
+
+  let trafficChart, purposeChart, plantChart;
+
+  async function loadDashboard() {
+    try {
+      const data = await apiCall('/reports/summary');
+      document.getElementById('statToday').textContent = data.total_today;
+      document.getElementById('statActive').textContent = data.active_now;
+      document.getElementById('statMonth').textContent = data.total_month;
+      document.getElementById('statAll').textContent = data.total_all;
+      drawTraffic(data.traffic_7days);
+      drawPurpose(data.purpose_breakdown);
+      drawPlant(data.plant_breakdown);
+      loadRecent();
+    } catch(e) {}
+  }
+
+  function drawTraffic(data) {
+    const ctx = document.getElementById('trafficChart').getContext('2d');
+    if (trafficChart) trafficChart.destroy();
+    trafficChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.map(d => d.date),
+        datasets: [{
+          label: 'Visitors',
+          data: data.map(d => d.count),
+          borderColor: '#1A3C6E',
+          backgroundColor: 'rgba(26,60,110,0.08)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#FF6B00',
+          pointRadius: 5
+        }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+  }
+
+  function drawPurpose(data) {
+    const ctx = document.getElementById('purposeChart').getContext('2d');
+    if (purposeChart) purposeChart.destroy();
+    const colors = ['#1A3C6E','#FF6B00','#28a745','#6b21a8','#dc3545','#17a2b8'];
+    purposeChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: data.map(d => d.purpose),
+        datasets: [{ data: data.map(d => d.count), backgroundColor: colors, borderWidth: 0 }]
+      },
+      options: { plugins: { legend: { position: 'bottom', labels: { font: { family: 'Poppins', size: 11 } } } }, cutout: '65%' }
+    });
+  }
+
+  function drawPlant(data) {
+    const ctx = document.getElementById('plantChart').getContext('2d');
+    if (plantChart) plantChart.destroy();
+    plantChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.plant),
+        datasets: [{
+          label: 'Visitors',
+          data: data.map(d => d.count),
+          backgroundColor: '#1A3C6E',
+          borderRadius: 6
+        }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+  }
+
+  async function loadRecent() {
+    try {
+      const visits = await apiCall('/visits/today');
+      const el = document.getElementById('recentList');
+      if (!visits.length) { el.innerHTML = '<p style="color:#888;font-size:0.9rem">No visitors today</p>'; return; }
+      el.innerHTML = visits.slice(0,8).map(v => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f0f4fb;">
+          <div>
+            <div style="font-weight:600; font-size:0.88rem">${v.visitor?.name}</div>
+            <div style="color:#888; font-size:0.78rem">${v.purpose} · ${v.plant}</div>
+          </div>
+          <span class="badge-status badge-${v.status === 'checked_out' ? 'checked-out' : v.status}">${v.status.replace('_',' ')}</span>
+        </div>
+      `).join('');
+    } catch(e) {}
+  }
+
+  loadDashboard();
+  setInterval(loadDashboard, 60000);
+</script>
+</body>
+</html>

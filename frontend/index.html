@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VMT – Orientbell Visitor Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --stone: #1C1917;
+      --stone-mid: #44403C;
+      --stone-light: #78716C;
+      --cream: #FAFAF8;
+      --cream-mid: #F5F0E8;
+      --cream-dark: #E7E0D5;
+      --gold: #C9A96E;
+      --gold-light: #E8D5B0;
+      --white: #FFFFFF;
+      --border: rgba(201,169,110,0.2);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--stone);
+      overflow-x: hidden;
+    }
+
+    .marble-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url('images/title-bg.png');
+    }
+
+    .marble-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(250,250,248,0.55) 0%,
+        rgba(245,240,232,0.45) 40%,
+        rgba(250,250,248,0.50) 100%
+      );
+    }
+
+    .marble-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 180px,
+        rgba(201,169,110,0.03) 180px,
+        rgba(201,169,110,0.03) 181px
+      );
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      background: rgba(250,250,248,0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-logo img { height: 38px; width: auto; }
+
+    .nav-logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--stone);
+      letter-spacing: 0.5px;
+    }
+
+    .nav-logo-text span { color: var(--gold); font-style: italic; }
+
+    .nav-right { display: flex; align-items: center; gap: 32px; }
+
+    .nav-link {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--stone-light);
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .nav-link:hover { color: var(--stone); }
+
+    .nav-cta {
+      background: var(--stone);
+      color: var(--cream) !important;
+      padding: 10px 24px;
+      border-radius: 3px;
+      font-size: 0.75rem !important;
+      letter-spacing: 1.5px !important;
+      font-weight: 600 !important;
+      transition: all 0.3s !important;
+    }
+
+    .nav-cta:hover { background: var(--gold) !important; color: var(--stone) !important; }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 100px 64px 60px;
+      gap: 80px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .hero-left { position: relative; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow-line {
+  width: 40px;
+  height: 1px;
+  background: #8B6914;
+}
+
+    .eyebrow-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #8B6914;
+}
+    .hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 5.2rem;
+  font-weight: 600;
+  line-height: 1.05;
+  color: #0a0a0a;
+  margin-bottom: 10px;
+  letter-spacing: -1px;
+  text-shadow: 0 2px 12px rgba(255,255,255,0.8);
+}
+    .hero-title em { font-style: italic; color: var(--gold); }
+
+    .hero-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: var(--stone-light);
+      margin-bottom: 28px;
+      font-style: italic;
+    }
+    .hero-desc {
+  font-size: 0.88rem;
+  color: #2a2a2a;
+  font-weight: 500;
+  line-height: 1.85;
+  max-width: 400px;
+  margin-bottom: 44px;
+  text-shadow: 0 1px 8px rgba(255,255,255,0.7);
+}
+
+    .hero-actions { display: flex; gap: 14px; align-items: center; }
+
+    .btn-primary {
+      background: var(--stone);
+      color: var(--cream);
+      padding: 14px 32px;
+      border-radius: 3px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary:hover {
+      background: var(--gold);
+      color: var(--stone);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(201,169,110,0.3);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--stone);
+      padding: 14px 32px;
+      border-radius: 3px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--cream-dark);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid var(--cream-dark);
+    }
+
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: var(--stone);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--stone-light);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* PORTAL CARD */
+    .hero-right { position: relative; }
+
+    .tile-grid-deco {
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 180px; height: 180px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px;
+      opacity: 0.4;
+      z-index: 0;
+    }
+
+    .tile-cell { aspect-ratio: 1; border-radius: 2px; background: var(--cream-dark); }
+    .tile-cell:nth-child(3n) { background: var(--gold-light); }
+    .tile-cell:nth-child(5n) { background: var(--cream-mid); }
+
+    .portal-card {
+      position: relative;
+      z-index: 1;
+      background: var(--white);
+      border: 1px solid var(--cream-dark);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.08), 0 40px 80px rgba(0,0,0,0.06);
+    }
+
+    .portal-header {
+      background: #6B4F0E;
+  padding: 28px 32px;
+  position: relative;
+  overflow: hidden;
+}
+    .portal-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(201,169,110,0.05) 20px, rgba(201,169,110,0.05) 21px);
+    }
+
+    .portal-header-tag {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .portal-header h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--white);
+    }
+
+    .portal-header p { color: rgba(255,255,255,0.4); font-size: 0.8rem; margin-top: 4px; }
+
+    .portal-body { padding: 28px 32px; }
+
+    .role-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 18px;
+      border-radius: 3px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-decoration: none;
+      margin-bottom: 8px;
+      background: var(--cream);
+    }
+
+    .role-item:last-child { margin-bottom: 0; }
+
+    .role-item:hover {
+      background: var(--stone);
+      border-color: var(--stone);
+      transform: translateX(4px);
+    }
+
+    .role-item:hover .ri-icon { background: rgba(201,169,110,0.15); color: var(--gold); }
+    .role-item:hover .ri-name { color: var(--white); }
+    .role-item:hover .ri-desc { color: rgba(255,255,255,0.4); }
+    .role-item:hover .ri-arrow { color: var(--gold); }
+
+    .ri-icon {
+      width: 42px; height: 42px;
+      background: var(--cream-dark);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--stone-light);
+      font-size: 0.95rem;
+      flex-shrink: 0;
+      transition: all 0.25s;
+    }
+
+    .ri-text { flex: 1; }
+    .ri-name { font-size: 0.88rem; font-weight: 600; color: var(--stone); transition: color 0.25s; }
+    .ri-desc { font-size: 0.75rem; color: var(--stone-light); margin-top: 2px; transition: color 0.25s; }
+    .ri-arrow { color: var(--cream-dark); font-size: 0.75rem; transition: color 0.25s; }
+
+    .portal-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .portal-divider::before,
+    .portal-divider::after { content: ''; flex: 1; height: 1px; background: var(--cream-dark); }
+
+    .portal-divider span {
+      font-size: 0.68rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--stone-light);
+      white-space: nowrap;
+    }
+
+    .portal-footer {
+      padding: 18px 32px;
+      border-top: 1px solid var(--cream-dark);
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .portal-footer i { color: var(--gold); font-size: 0.8rem; }
+    .portal-footer span { font-size: 0.75rem; color: var(--stone-light); }
+
+    /* TILE STRIP */
+    .tile-strip {
+      position: relative;
+      z-index: 1;
+      background: var(--cream-mid);
+      padding: 80px 64px;
+      border-top: 1px solid var(--cream-dark);
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .tile-strip-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .tile-strip h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.8rem;
+      font-weight: 300;
+      color: var(--stone);
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .tile-strip h2 em { font-style: italic; color: var(--gold); }
+
+    .tile-strip p {
+      font-size: 0.85rem;
+      color: var(--stone-light);
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+
+    .section-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .section-eyebrow .line { width: 32px; height: 1px; background: var(--gold); }
+
+    .section-eyebrow span {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .tile-mosaic {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(4, 60px);
+      gap: 4px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .tm { border-radius: 2px; transition: all 0.4s; }
+    .tm:hover { transform: scale(0.95); opacity: 0.8; }
+    .tm-1 { grid-column: span 2; grid-row: span 2; background: linear-gradient(135deg, #E8E4DC, #D4CEC4); }
+    .tm-2 { grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, #C9A96E, #B8944A); }
+    .tm-3 { grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, #F5F0E8, #EDE6D6); }
+    .tm-4 { grid-column: span 2; grid-row: span 1; background: linear-gradient(135deg, #1C1917, #2D2926); }
+    .tm-5 { grid-column: span 1; grid-row: span 2; background: linear-gradient(135deg, #DDD6C8, #C8C0B0); }
+    .tm-6 { grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, #F0EBE0, #E4DDD0); }
+    .tm-7 { grid-column: span 2; grid-row: span 2; background: linear-gradient(135deg, #44403C, #5A5550); }
+    .tm-8 { grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, #E8D5B0, #D4B880); }
+    .tm-9 { grid-column: span 2; grid-row: span 1; background: linear-gradient(135deg, #FAFAF8, #F0EBE0); }
+    .tm-10 { grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, #C9A96E, #A8854A); }
+    .tm-11 { grid-column: span 2; grid-row: span 2; background: linear-gradient(135deg, #F5F0E8, #E8E0D0); position: relative; overflow: hidden; }
+    .tm-11::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(201,169,110,0.1) 8px, rgba(201,169,110,0.1) 9px); }
+    .tm-12 { grid-column: span 1; grid-row: span 1; background: #1C1917; }
+    .tm-13 { grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, #E0D8C8, #D0C8B0); }
+
+    /* FEATURES */
+    .features-section {
+      position: relative;
+      z-index: 1;
+      padding: 120px 64px;
+      background: var(--stone);
+    }
+
+    .features-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(-45deg, transparent, transparent 60px, rgba(201,169,110,0.03) 60px, rgba(201,169,110,0.03) 61px);
+      pointer-events: none;
+    }
+
+    .features-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+
+    .section-title-dark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.2rem;
+      font-weight: 300;
+      color: var(--white);
+      margin-bottom: 70px;
+      max-width: 600px;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+    }
+
+    .section-title-dark em { font-style: italic; color: var(--gold); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .feature-cell {
+      padding: 40px 36px;
+      background: rgba(255,255,255,0.02);
+      transition: background 0.3s;
+    }
+
+    .feature-cell:hover { background: rgba(201,169,110,0.06); }
+
+    .feature-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      font-weight: 300;
+      color: rgba(201,169,110,0.15);
+      line-height: 1;
+      margin-bottom: 20px;
+      letter-spacing: -2px;
+    }
+
+    .feature-icon {
+      width: 40px; height: 40px;
+      background: rgba(201,169,110,0.1);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .feature-title { font-size: 0.9rem; font-weight: 600; color: var(--white); margin-bottom: 10px; }
+    .feature-desc { font-size: 0.8rem; color: rgba(255,255,255,0.35); line-height: 1.7; }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      background: var(--stone);
+      padding: 48px 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .footer-logo { display: flex; align-items: center; gap: 12px; }
+    .footer-logo img { height: 32px; filter: brightness(0) invert(1) opacity(0.6); }
+
+    .footer-logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .footer-logo-text span { color: var(--gold); }
+    .footer-copy { font-size: 0.75rem; color: rgba(255,255,255,0.25); }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(28,25,23,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .login-modal {
+      background: var(--white);
+      border-radius: 4px;
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .modal-top { background: var(--stone); padding: 32px 40px; }
+
+    .modal-top-tag {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .modal-top h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: var(--white);
+    }
+
+    .modal-body { padding: 32px 40px; }
+
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 18px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      width: 30px; height: 30px;
+      border-radius: 3px;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover { background: rgba(255,255,255,0.2); color: white; }
+
+    .m-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--stone-light);
+      margin-bottom: 8px;
+    }
+
+    .m-input {
+      width: 100%;
+      border: 1px solid var(--cream-dark);
+      border-radius: 3px;
+      padding: 12px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--stone);
+      background: var(--cream);
+      outline: none;
+      transition: all 0.2s;
+      margin-bottom: 20px;
+    }
+
+    .m-input:focus { border-color: var(--gold); background: white; box-shadow: 0 0 0 3px rgba(201,169,110,0.1); }
+
+    .m-submit {
+      width: 100%;
+      background: var(--stone);
+      color: var(--cream);
+      border: none;
+      padding: 14px;
+      border-radius: 3px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .m-submit:hover { background: var(--gold); color: var(--stone); }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      top: 24px; right: 24px;
+      background: var(--stone);
+      color: var(--cream);
+      padding: 14px 22px;
+      border-radius: 3px;
+      font-size: 0.82rem;
+      z-index: 9999;
+      transform: translateX(130%);
+      transition: transform 0.35s ease;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      border-left: 3px solid var(--gold);
+    }
+
+    .toast.show { transform: translateX(0); }
+    .toast.error { border-left-color: #E74C3C; }
+    .toast.success { border-left-color: #27AE60; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .fade-up { opacity: 0; transform: translateY(24px); animation: fadeUp 0.8s ease forwards; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+    .fade-up:nth-child(1) { animation-delay: 0.1s; }
+    .fade-up:nth-child(2) { animation-delay: 0.2s; }
+    .fade-up:nth-child(3) { animation-delay: 0.3s; }
+    .fade-up:nth-child(4) { animation-delay: 0.4s; }
+    .fade-up:nth-child(5) { animation-delay: 0.5s; }
+
+    @media (max-width: 1024px) {
+      .hero { grid-template-columns: 1fr; padding: 100px 28px 60px; gap: 48px; }
+      .hero-title { font-size: 3.2rem; }
+      .features-section, .tile-strip { padding: 80px 28px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .tile-strip-inner { grid-template-columns: 1fr; }
+      nav { padding: 0 28px; }
+      footer { padding: 36px 28px; flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="marble-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="images/logo.png" alt="Orientbell" onerror="this.style.display='none'"/>
+    <div class="nav-logo-text">VMT <span>| Orientbell</span></div>
+  </div>
+  <div class="nav-right">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#about" class="nav-link">About</a>
+    <a href="register.html" class="nav-link nav-cta">Visitor Check-In</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow fade-up">
+      <div class="eyebrow-line"></div>
+      <div class="eyebrow-text">Orientbell Limited — Est. 1977</div>
+    </div>
+    <h1 class="hero-title fade-up">
+      Visitor<br/>Management<br/><em>Portal.</em>
+    </h1>
+    <p class="hero-subtitle fade-up">For the modern plant floor.</p>
+    <p class="hero-desc fade-up">A premium digital check-in system built for Orientbell's multi-plant operations. QR badges, instant host alerts, live dashboards — seamlessly integrated.</p>
+    <div class="hero-actions fade-up">
+      <a href="register.html" class="btn-primary"><i class="fas fa-arrow-right"></i> Visitor Check-In</a>
+      <a href="#features" class="btn-ghost">Explore Features</a>
+    </div>
+    <div class="hero-stats fade-up">
+      <div class="hero-stat">
+        <div class="stat-num">6+</div>
+        <div class="stat-label">Plant Locations</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Access Roles</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Paperless</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Live Tracking</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right fade-up">
+    <div class="tile-grid-deco">
+      <div class="tile-cell"></div><div class="tile-cell"></div>
+      <div class="tile-cell"></div><div class="tile-cell"></div>
+      <div class="tile-cell"></div><div class="tile-cell"></div>
+      <div class="tile-cell"></div><div class="tile-cell"></div>
+      <div class="tile-cell"></div><div class="tile-cell"></div>
+      <div class="tile-cell"></div><div class="tile-cell"></div>
+      <div class="tile-cell"></div><div class="tile-cell"></div>
+      <div class="tile-cell"></div><div class="tile-cell"></div>
+    </div>
+    <div class="portal-card">
+      <div class="portal-header">
+        <div class="portal-header-tag">Staff Portal</div>
+        <h3>Welcome Back</h3>
+        <p>Select your role to continue</p>
+      </div>
+      <div class="portal-body">
+
+        <!-- VISITOR SECTION - TOP & HIGHLIGHTED -->
+        <a href="register.html" style="
+        display:flex; align-items:center; gap:16px;
+        background: linear-gradient(135deg, #F5F0E8, #EDE6D6);
+        border-radius: 6px; padding: 20px 18px;
+        text-decoration: none; margin-bottom: 16px;
+        transition: all 0.3s; border: 1px solid rgba(107,79,14,0.2);
+        position: relative; overflow: hidden;
+      " onmouseover="this.style.transform='translateX(4px)'" onmouseout="this.style.transform='translateX(0)'">
+        <div style="position:absolute; inset:0; background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(201,169,110,0.05) 20px, rgba(201,169,110,0.05) 21px);"></div>
+        <div style="width:48px; height:48px; background:rgba(107,79,14,0.1); border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative;">
+          <i class="fas fa-qrcode" style="color:#6B4F0E; font-size:1.1rem;"></i>
+        </div>
+        <div style="flex:1; position:relative;">
+          <div style="font-size:0.5rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#6B4F0E; margin-bottom:4px;">Visitors — Start Here</div>
+          <div style="font-size:0.95rem; font-weight:600; color:#1C1917; margin-bottom:3px;">Self Check-In</div>
+          <div style="font-size:0.78rem; color:#78716C;">Register yourself & get your QR badge instantly</div>
+        </div>
+        <i class="fas fa-arrow-right" style="color:#6B4F0E; font-size:0.85rem; position:relative;"></i>
+      </a>
+
+        <div class="portal-divider"><span>staff login</span></div>
+
+        <div class="role-item" onclick="openLogin('Receptionist')">
+          <div class="ri-icon"><i class="fas fa-concierge-bell"></i></div>
+          <div class="ri-text">
+            <div class="ri-name">Receptionist</div>
+            <div class="ri-desc">Manage walk-in visitor check-ins</div>
+          </div>
+          <i class="fas fa-chevron-right ri-arrow"></i>
+        </div>
+        <div class="role-item" onclick="openLogin('Host')">
+          <div class="ri-icon"><i class="fas fa-user-tie"></i></div>
+          <div class="ri-text">
+            <div class="ri-name">Host</div>
+            <div class="ri-desc">View & approve your visitors</div>
+          </div>
+          <i class="fas fa-chevron-right ri-arrow"></i>
+        </div>
+        <div class="role-item" onclick="openLogin('Admin')" style="margin-bottom:0;">
+          <div class="ri-icon"><i class="fas fa-chart-line"></i></div>
+          <div class="ri-text">
+            <div class="ri-name">Admin</div>
+            <div class="ri-desc">Analytics, reports & full control</div>
+          </div>
+          <i class="fas fa-chevron-right ri-arrow"></i>
+        </div>
+
+      </div>
+      <div class="portal-footer">
+        <i class="fas fa-shield-alt"></i>
+        <span>Secured with JWT authentication</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TILE STRIP -->
+<section class="tile-strip" id="about">
+  <div class="tile-strip-inner">
+    <div>
+      <div class="section-eyebrow">
+        <div class="line"></div>
+        <span>India's Leading Tile Manufacturer</span>
+      </div>
+      <h2>Crafting <em>Excellence</em><br/>Since 1977</h2>
+      <p>Orientbell Tiles operates across multiple manufacturing plants in India, producing world-class ceramic, vitrified and digital tiles. This VMT system ensures every visitor to our facilities is welcomed with the same precision and care that goes into every tile we make.</p>
+      <a href="register.html" class="btn-primary"><i class="fas fa-arrow-right"></i> Register Your Visit</a>
+    </div>
+    <div class="tile-mosaic">
+      <div class="tm tm-1"></div><div class="tm tm-2"></div>
+      <div class="tm tm-3"></div><div class="tm tm-4"></div>
+      <div class="tm tm-5"></div><div class="tm tm-6"></div>
+      <div class="tm tm-7"></div><div class="tm tm-8"></div>
+      <div class="tm tm-9"></div><div class="tm tm-10"></div>
+      <div class="tm tm-11"></div><div class="tm tm-12"></div>
+      <div class="tm tm-13"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="features-inner">
+    <div class="section-eyebrow">
+      <div class="line"></div>
+      <span>Platform Capabilities</span>
+    </div>
+    <h2 class="section-title-dark">Built for <em>precision,</em><br/>designed for scale.</h2>
+    <div class="features-grid">
+      <div class="feature-cell">
+        <div class="feature-num">01</div>
+        <div class="feature-icon"><i class="fas fa-tablet-alt"></i></div>
+        <div class="feature-title">Digital Self Check-In</div>
+        <div class="feature-desc">Visitors register online in seconds — no paper forms, no waiting queues at reception.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-num">02</div>
+        <div class="feature-icon"><i class="fas fa-qrcode"></i></div>
+        <div class="feature-title">Smart QR Badges</div>
+        <div class="feature-desc">Auto-generated badges with unique QR codes that expire automatically on check-out.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-num">03</div>
+        <div class="feature-icon"><i class="fas fa-bell"></i></div>
+        <div class="feature-title">Instant Host Alerts</div>
+        <div class="feature-desc">Hosts receive real-time notifications the moment their guest checks in at the gate.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-num">04</div>
+        <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+        <div class="feature-title">Live Analytics Dashboard</div>
+        <div class="feature-desc">Real-time visitor counts, plant-wise traffic and trend analysis updated continuously.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-num">05</div>
+        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="feature-title">Multi-Plant Access Control</div>
+        <div class="feature-desc">Manage all Orientbell plant locations from one unified admin panel with role-based access.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-num">06</div>
+        <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="feature-title">Compliance & Audit Trail</div>
+        <div class="feature-desc">Full visitor history with timestamps — exportable CSV reports for security compliance.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="images/logo.png" alt="Orientbell" onerror="this.style.display='none'"/>
+    <div class="footer-logo-text">VMT <span>| Orientbell Limited</span></div>
+  </div>
+  <div class="footer-copy">&copy; 2025 Orientbell Limited. All rights reserved.</div>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+  <div class="login-modal">
+    <button class="modal-close" onclick="closeLogin()"><i class="fas fa-times"></i></button>
+    <div class="modal-top">
+      <div class="modal-top-tag" id="loginRoleTag">Staff Login</div>
+      <h2>Sign in to VMT</h2>
+    </div>
+    <div class="modal-body">
+      <label class="m-label">Email Address</label>
+      <input type="email" id="loginEmail" class="m-input" placeholder="your@orientbell.com"/>
+      <label class="m-label">Password</label>
+      <input type="password" id="loginPassword" class="m-input" placeholder="••••••••"/>
+      <button class="m-submit" onclick="doLogin()">
+        <span id="loginBtnText">Sign In</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="vmtToast"></div>
+
+<script>
+  function showToast(msg, type) {
+    const t = document.getElementById('vmtToast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  function openLogin(role) {
+    document.getElementById('loginRoleTag').textContent = role + ' Login';
+    document.getElementById('loginModal').classList.add('active');
+  }
+
+  function closeLogin() {
+    document.getElementById('loginModal').classList.remove('active');
+  }
+
+  async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) { showToast('Please enter email and password', 'error'); return; }
+
+    document.getElementById('loginBtnText').innerHTML = '<span class="spinner"></span>';
+
+    try {
+      const res = await fetch('http://127.0.0.1:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
+
+      localStorage.setItem('vmt_token', data.token);
+      localStorage.setItem('vmt_user', JSON.stringify(data.user));
+
+      const role = data.user.role;
+      if (role === 'admin') window.location.href = 'admin.html';
+      else if (role === 'receptionist') window.location.href = 'receptionist.html';
+      else if (role === 'host') window.location.href = 'host.html';
+    } catch(e) {
+      showToast(e.message, 'error');
+      document.getElementById('loginBtnText').textContent = 'Sign In';
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.getElementById('loginModal').classList.contains('active')) doLogin();
+  });
+</script>
+</body>
+</html>
