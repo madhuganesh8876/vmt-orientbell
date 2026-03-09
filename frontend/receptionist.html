@@ -279,7 +279,7 @@
     document.getElementById('bmSub').textContent = company || 'Visitor';
     document.getElementById('bmPurpose').textContent = purpose;
     document.getElementById('bmTime').textContent = formatDate(checkIn);
-    document.getElementById('bmQR').src = `http://localhost:5000/api/badges/qr/${visitId}`;
+    document.getElementById('bmQR').src = `https://vmt-backend-4tpn.onrender.com/api/badges/qr/${visitId}`;
     document.getElementById('badgeModal').classList.add('active');
   }
 
