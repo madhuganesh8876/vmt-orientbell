@@ -1,8 +1,8 @@
 # Gunicorn Production Configuration
-workers = 4
+workers = 2
 worker_class = "gthread"
 threads = 2
-worker_connections = 1000
+worker_connections = 100
 timeout = 120
 keepalive = 5
 max_requests = 1000
