@@ -969,7 +969,7 @@
 </div>
 
 <div class="toast" id="vmtToast"></div>
-
+<script src="js/config.js"></script>
 <script>
   function showToast(msg, type) {
     const t = document.getElementById('vmtToast');
@@ -995,7 +995,8 @@
     document.getElementById('loginBtnText').innerHTML = '<span class="spinner"></span>';
 
     try {
-      const res = await fetch('https://vmt-backend-4tpn.onrender.com/api/auth/login', {
+      
+      const res = await fetch(`${CONFIG.API}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

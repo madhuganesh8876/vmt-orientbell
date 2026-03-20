@@ -1,4 +1,4 @@
-const API = 'https://vmt-backend-4tpn.onrender.com/api';
+const API = CONFIG.API;
 
 // Show toast notification
 function showToast(message, type = 'success') {
@@ -56,12 +56,18 @@ function logout() {
   window.location.href = 'index.html';
 }
 
-// Format date
+// Format date — converts UTC from backend to IST automatically
 function formatDate(dateStr) {
   if (!dateStr) return '-';
-  return new Date(dateStr).toLocaleString('en-IN', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
+  const date = new Date(dateStr + 'Z');
+  return date.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Kolkata'
   });
 }
 

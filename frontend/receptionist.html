@@ -177,7 +177,9 @@
   </div>
 </div>
 
-<script src="js/app.js"></script>
+<script src="js/config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
 <script>
   const user = requireAuth(['receptionist', 'admin']);
   if (user) document.getElementById('userName').textContent = user.name;
@@ -279,7 +281,7 @@
     document.getElementById('bmSub').textContent = company || 'Visitor';
     document.getElementById('bmPurpose').textContent = purpose;
     document.getElementById('bmTime').textContent = formatDate(checkIn);
-    document.getElementById('bmQR').src = `https://vmt-backend-4tpn.onrender.com/api/badges/qr/${visitId}`;
+    document.getElementById('bmQR').src = `${CONFIG.API}/badges/qr/${visitId}`;
     document.getElementById('badgeModal').classList.add('active');
   }
 

@@ -14,27 +14,27 @@
     .top-nav button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: inherit; }
     .notif-bell { position: relative; cursor: pointer; }
     .notif-count { position: absolute; top: -8px; right: -8px; background: var(--accent); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-
     .page-body { padding: 28px; max-width: 1100px; margin: 0 auto; }
-
-    .welcome-card { background: linear-gradient(135deg, var(--primary), #2d5fa8); color: white; border-radius: var(--radius); padding: 28px 32px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+    .welcome-card { background: linear-gradient(135deg, var(--primary), #2d5fa8); color: white; border-radius: var(--radius); padding: 28px 32px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
     .welcome-card h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
     .welcome-card p { opacity: 0.8; font-size: 0.9rem; }
     .welcome-card .big-num { font-size: 3rem; font-weight: 800; color: var(--accent); }
-
     .section-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-
-    .visitor-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
-
-    .visitor-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border-top: 4px solid var(--accent); }
+    .visitor-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .visitor-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border-top: 4px solid var(--accent); transition: transform 0.2s; }
+    .visitor-card:hover { transform: translateY(-2px); }
     .visitor-card .vc-name { font-weight: 700; font-size: 1rem; color: var(--dark); margin-bottom: 4px; }
     .visitor-card .vc-company { color: #888; font-size: 0.85rem; margin-bottom: 14px; }
     .visitor-card .vc-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
     .visitor-card .vc-detail { font-size: 0.8rem; color: #555; }
-    .visitor-card .vc-detail strong { color: var(--primary); display: block; font-size: 0.75rem; }
-    .btn-approve { background: #e8f9ef; color: #1a8a4a; border: 1px solid #a8e6c0; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; font-family: inherit; transition: all 0.2s; }
+    .visitor-card .vc-detail strong { color: var(--primary); display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-approve { background: #e8f9ef; color: #1a8a4a; border: 1px solid #a8e6c0; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; font-family: inherit; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
     .btn-approve:hover { background: #1a8a4a; color: white; }
-
+    .btn-busy { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; font-family: inherit; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+    .btn-busy:hover { background: #e65100; color: white; }
+    .btn-reschedule { background: #e8f0fd; color: var(--primary); border: 1px solid #c5d4f5; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; font-family: inherit; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+    .btn-reschedule:hover { background: var(--primary); color: white; }
     .notif-panel { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
     .notif-panel .notif-header { background: var(--primary); color: white; padding: 16px 20px; font-weight: 600; }
     .notif-item { padding: 16px 20px; border-bottom: 1px solid #f0f4fb; display: flex; align-items: flex-start; gap: 14px; transition: background 0.2s; cursor: pointer; }
@@ -43,6 +43,39 @@
     .notif-icon { width: 38px; height: 38px; background: rgba(255,107,0,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; }
     .notif-text { font-size: 0.88rem; color: var(--dark); }
     .notif-time { font-size: 0.78rem; color: #aaa; margin-top: 4px; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.active { display: flex; }
+    .modal-box { background: white; border-radius: 16px; padding: 32px; width: 100%; max-width: 420px; }
+    .modal-box h3 { color: var(--primary); font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .modal-box p { color: #888; font-size: 0.85rem; margin-bottom: 24px; }
+    .modal-box label { font-size: 0.82rem; font-weight: 600; color: #555; display: block; margin-bottom: 6px; }
+    .modal-box input, .modal-box textarea { width: 100%; border: 1.5px solid #e0e4f0; border-radius: 8px; padding: 10px 14px; font-family: inherit; font-size: 0.88rem; color: #1a1a1a; background: #fafbff; outline: none; margin-bottom: 16px; transition: border 0.2s; }
+    .modal-box input:focus, .modal-box textarea:focus { border-color: var(--primary); }
+    .modal-box textarea { resize: vertical; min-height: 80px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+    .btn-cancel-modal { background: none; border: 1.5px solid #ddd; color: #888; padding: 9px 20px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.88rem; }
+    .btn-send-modal { background: var(--primary); color: white; border: none; padding: 9px 20px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.88rem; font-weight: 600; }
+    .btn-send-modal:hover { background: #2d5fa8; }
+    .busy-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .busy-option { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 1.5px solid #e0e4f0; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 0.88rem; }
+    .busy-option:hover, .busy-option.selected { border-color: var(--primary); background: #f0f4fb; color: var(--primary); font-weight: 600; }
+    .busy-option i { color: var(--accent); width: 20px; }
+    .badge-rejected { background: #ffeaea; color: #c0392b; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .badge-rescheduled { background: #e8f0fd; color: var(--primary); padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    @keyframes pulse-border {
+      0%, 100% { border-top-color: var(--accent); }
+      50% { border-top-color: #ff9900; }
+    }
+    .visitor-card.pending-pulse { animation: pulse-border 2s ease-in-out infinite; }
+    @media(max-width: 768px) {
+      .page-body { padding: 16px; }
+      .top-nav { padding: 12px 16px; }
+      .welcome-card { padding: 20px; }
+      .welcome-card h2 { font-size: 1.2rem; }
+      .visitor-cards { grid-template-columns: 1fr; }
+      .card-actions { flex-direction: column; }
+      .card-actions button { width: 100%; justify-content: center; }
+    }
   </style>
 </head>
 <body>
@@ -73,6 +106,7 @@
 
   <div class="section-title">
     <i class="fas fa-clock" style="color:var(--accent)"></i> Pending Approvals
+    <span id="pendingBadge" style="background:var(--accent); color:white; border-radius:20px; padding:2px 10px; font-size:0.75rem; font-weight:700; display:none"></span>
   </div>
   <div class="visitor-cards" id="pendingCards">
     <p style="color:#888; font-size:0.9rem">Loading...</p>
@@ -105,6 +139,53 @@
   </div>
 </div>
 
+<!-- Reschedule Modal -->
+<div class="modal-overlay" id="rescheduleModal">
+  <div class="modal-box">
+    <h3><i class="fas fa-calendar-alt" style="color:var(--accent)"></i> Suggest a New Time</h3>
+    <p>Let the visitor know when you're available to meet them.</p>
+    <input type="hidden" id="rsVisitId"/>
+    <label>Suggested Date & Time</label>
+    <input type="datetime-local" id="rsDateTime"/>
+    <label>Message to Visitor / Receptionist</label>
+    <textarea id="rsMessage" placeholder="e.g. I'm currently in a meeting. Please come back at the suggested time."></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel-modal" onclick="closeModal('rescheduleModal')">Cancel</button>
+      <button class="btn-send-modal" onclick="submitReschedule()"><i class="fas fa-paper-plane"></i> Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Busy Modal -->
+<div class="modal-overlay" id="busyModal">
+  <div class="modal-box">
+    <h3><i class="fas fa-ban" style="color:#e65100"></i> Mark as Busy</h3>
+    <p>Select a reason to send to the receptionist.</p>
+    <input type="hidden" id="busyVisitId"/>
+    <div class="busy-options">
+      <div class="busy-option" onclick="selectBusy(this, 'I am currently in a meeting.')">
+        <i class="fas fa-users"></i> In a meeting
+      </div>
+      <div class="busy-option" onclick="selectBusy(this, 'I am on a call right now.')">
+        <i class="fas fa-phone"></i> On a call
+      </div>
+      <div class="busy-option" onclick="selectBusy(this, 'Please ask the visitor to wait for 15 minutes.')">
+        <i class="fas fa-hourglass-half"></i> Ask to wait 15 mins
+      </div>
+      <div class="busy-option" onclick="selectBusy(this, 'I am not available today. Please reschedule.')">
+        <i class="fas fa-calendar-times"></i> Not available today
+      </div>
+    </div>
+    <label>Or type a custom message</label>
+    <textarea id="busyMessage" placeholder="Type your reason..."></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel-modal" onclick="closeModal('busyModal')">Cancel</button>
+      <button class="btn-send-modal" style="background:#e65100" onclick="submitBusy()"><i class="fas fa-ban"></i> Send Busy</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
 <script src="js/app.js"></script>
 <script>
   const user = requireAuth(['host', 'admin']);
@@ -123,12 +204,28 @@
 
       const pending = myVisits.filter(v => v.status === 'pending');
       const pendingEl = document.getElementById('pendingCards');
+
+      const badge = document.getElementById('pendingBadge');
+      if (pending.length > 0) {
+        badge.textContent = `${pending.length} waiting`;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+
       if (!pending.length) {
-        pendingEl.innerHTML = '<p style="color:#888; font-size:0.9rem">No pending approvals</p>';
+        pendingEl.innerHTML = `
+          <div style="background:white; border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); color:#888; display:flex; align-items:center; gap:12px;">
+            <i class="fas fa-check-circle" style="color:#1a8a4a; font-size:1.4rem;"></i>
+            <span>No pending approvals — you're all caught up!</span>
+          </div>`;
       } else {
         pendingEl.innerHTML = pending.map(v => `
-          <div class="visitor-card">
-            <div class="vc-name">${v.visitor?.name}</div>
+          <div class="visitor-card pending-pulse" data-visit-id="${v.id}">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+              <div class="vc-name">${v.visitor?.name || '-'}</div>
+              <span style="background:#fff3e0; color:#e65100; font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:20px;">WAITING</span>
+            </div>
             <div class="vc-company">${v.visitor?.company || 'Individual'}</div>
             <div class="vc-details">
               <div class="vc-detail"><strong>Purpose</strong>${v.purpose}</div>
@@ -136,9 +233,17 @@
               <div class="vc-detail"><strong>Phone</strong>${v.visitor?.phone || '-'}</div>
               <div class="vc-detail"><strong>Plant</strong>${v.plant}</div>
             </div>
-            <button class="btn-approve" onclick="approveVisit(${v.id})">
-              <i class="fas fa-check"></i> Approve
-            </button>
+            <div class="card-actions">
+              <button class="btn-approve" onclick="approveVisit(${v.id})">
+                <i class="fas fa-check"></i> Approve
+              </button>
+              <button class="btn-busy" onclick="openBusyModal(${v.id})">
+                <i class="fas fa-ban"></i> Busy
+              </button>
+              <button class="btn-reschedule" onclick="openRescheduleModal(${v.id})">
+                <i class="fas fa-calendar-alt"></i> Reschedule
+              </button>
+            </div>
           </div>
         `).join('');
       }
@@ -149,24 +254,105 @@
       } else {
         tbody.innerHTML = myVisits.map(v => `
           <tr>
-            <td><strong>${v.visitor?.name}</strong></td>
+            <td><strong>${v.visitor?.name || '-'}</strong><br><small style="color:#888">${v.visitor?.phone || ''}</small></td>
             <td>${v.visitor?.company || '-'}</td>
             <td>${v.purpose}</td>
             <td style="font-size:0.82rem">${formatDate(v.check_in)}</td>
-            <td><span class="badge-status badge-${v.status === 'checked_out' ? 'checked-out' : v.status}">${v.status.replace('_',' ')}</span></td>
+            <td>${getStatusBadge(v.status)}</td>
           </tr>
         `).join('');
       }
     } catch(e) {}
   }
 
+  function getStatusBadge(status) {
+    const map = {
+      'active': '<span class="badge-status badge-active">active</span>',
+      'checked_out': '<span class="badge-status badge-checked-out">checked out</span>',
+      'pending': '<span class="badge-status badge-pending">pending</span>',
+      'rejected': '<span class="badge-rejected">busy / rejected</span>',
+      'rescheduled': '<span class="badge-rescheduled">rescheduled</span>',
+    };
+    return map[status] || `<span class="badge-status">${status}</span>`;
+  }
+
   async function approveVisit(visitId) {
+    const card = document.querySelector(`[data-visit-id="${visitId}"]`);
+    if (card) card.remove();
     try {
       await apiCall(`/visits/approve/${visitId}`, 'PUT');
-      showToast('Visitor approved!', 'success');
-      loadTodayVisits();
-    } catch(e) {}
+      showToast('✅ Visitor approved! They can come in.', 'success');
+    } catch(e) {
+      showToast('Failed to approve. Try again.', 'error');
+    }
+    loadTodayVisits();
   }
+
+  function openBusyModal(visitId) {
+    document.getElementById('busyVisitId').value = visitId;
+    document.getElementById('busyMessage').value = '';
+    document.querySelectorAll('.busy-option').forEach(o => o.classList.remove('selected'));
+    document.getElementById('busyModal').classList.add('active');
+  }
+
+  function selectBusy(el, msg) {
+    document.querySelectorAll('.busy-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('busyMessage').value = msg;
+  }
+
+  async function submitBusy() {
+    const visitId = document.getElementById('busyVisitId').value;
+    const message = document.getElementById('busyMessage').value.trim();
+    if (!message) { showToast('Please select or type a reason', 'error'); return; }
+    closeModal('busyModal');
+    const card = document.querySelector(`[data-visit-id="${visitId}"]`);
+    if (card) card.remove();
+    try {
+      await apiCall(`/visits/reject/${visitId}`, 'PUT', { message });
+      showToast('📢 Receptionist notified you are busy.', 'success');
+    } catch(e) {
+      showToast('Failed to update. Try again.', 'error');
+    }
+    loadTodayVisits();
+  }
+
+  function openRescheduleModal(visitId) {
+    document.getElementById('rsVisitId').value = visitId;
+    document.getElementById('rsMessage').value = '';
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    document.getElementById('rsDateTime').value = now.toISOString().slice(0,16);
+    document.getElementById('rescheduleModal').classList.add('active');
+  }
+
+  async function submitReschedule() {
+    const visitId = document.getElementById('rsVisitId').value;
+    const dateTime = document.getElementById('rsDateTime').value;
+    const message = document.getElementById('rsMessage').value.trim();
+    if (!dateTime) { showToast('Please select a date and time', 'error'); return; }
+    closeModal('rescheduleModal');
+    const card = document.querySelector(`[data-visit-id="${visitId}"]`);
+    if (card) card.remove();
+    const finalMsg = message || `Please reschedule your visit to ${new Date(dateTime).toLocaleString('en-IN', {dateStyle:'medium', timeStyle:'short'})}`;
+    try {
+      await apiCall(`/visits/reschedule/${visitId}`, 'PUT', { scheduled_time: dateTime, message: finalMsg });
+      showToast('📅 Reschedule request sent!', 'success');
+    } catch(e) {
+      showToast('Failed to reschedule. Try again.', 'error');
+    }
+    loadTodayVisits();
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('active');
+    });
+  });
 
   async function loadNotifications() {
     if (!user) return;
@@ -174,13 +360,11 @@
       const notifs = await apiCall(`/notifications/${user.id}`);
       const unread = notifs.filter(n => !n.is_read).length;
       document.getElementById('notifCount').textContent = unread;
-
       const list = document.getElementById('notifList');
       if (!notifs.length) {
         list.innerHTML = '<div style="padding:20px; text-align:center; color:#888">No notifications yet</div>';
         return;
       }
-
       list.innerHTML = notifs.slice(0,10).map(n => `
         <div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="markRead(${n.id}, this)">
           <div class="notif-icon"><i class="fas fa-user"></i></div>

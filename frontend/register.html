@@ -397,9 +397,9 @@
 </div>
 
 <div class="toast" id="vmtToast"></div>
-
+<script src="js/config.js"></script>
 <script>
-  const API = 'https://vmt-backend-4tpn.onrender.com/api';
+  const API = CONFIG.API;
 
   function showToast(msg, type) {
     const t = document.getElementById('vmtToast');

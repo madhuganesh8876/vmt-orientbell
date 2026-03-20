@@ -13,6 +13,12 @@ CORS(app, origins="*")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'mysql+mysqlconnector://root:yourpassword@localhost/vmt_db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_size': 2,
+    'max_overflow': 0,
+    'pool_recycle': 180,
+    'pool_pre_ping': True
+}
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET', 'vmt-secret-key-orientbell-2025')
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587

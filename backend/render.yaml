@@ -3,7 +3,7 @@ services:
     name: vmt-backend
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app -c gunicorn.conf.py
     envVars:
       - key: DATABASE_URL
         sync: false
